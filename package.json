@@ -1,0 +1,16 @@
+{
+  "name": "minesweeper",
+  "version": "1.0.0",
+  "description": "Minesweeper game",
+  "main": "app.js",
+  "type": "module",
+  "scripts": {
+    "start": "node server/app.js"
+  },
+  "author": "Aitor Perez",
+  "license": "ISC",
+  "dependencies": {
+    "express": "^5.2.1",
+    "p5": "^2.1.2"
+  }
+}
