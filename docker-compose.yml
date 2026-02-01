@@ -1,0 +1,8 @@
+services:
+  minesweeper:
+    build: .
+    image: registry.home:5000/minesweeper:latest
+    restart: unless-stopped
+    container_name: minesweeper
+    ports:
+      - "8080:8080"
