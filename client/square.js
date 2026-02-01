@@ -17,6 +17,18 @@ class Square {
     this.revealed = false;
     this.mine = false;
     this.flag = false;
+
+    // Relationship between numbers and their colors
+    this.colors = {
+      1: (123, 104, 238), // Light blue
+      2: (50, 205, 50), // Green
+      3: (255, 0, 0), // Red
+      4: (0, 0, 139), // Dark blue
+      5: (139, 0, 0), // Dark red
+      6: (32, 178, 170), // Sea green
+      7: 0, // Black
+      8: 100, // Grey
+    };
   }
 
   draw() {
@@ -39,7 +51,7 @@ class Square {
         this.x + this.size / 2,
         this.y + this.size / 2,
         this.size / 2,
-        this.size / 2
+        this.size / 2,
       );
     }
 
@@ -54,35 +66,10 @@ class Square {
           this.x + this.size / 2,
           this.y + this.size / 2,
           this.size / 2,
-          this.size / 2
+          this.size / 2,
         );
       } else if (this.number != 0) {
-        // Draw the number
-        if (this.number == 1) {
-          // Light blue
-          fill(123, 104, 238);
-        } else if (this.number == 2) {
-          // Green
-          fill(50, 205, 50);
-        } else if (this.number == 3) {
-          // Red
-          fill(255, 0, 0);
-        } else if (this.number == 4) {
-          // Dark blue
-          fill(0, 0, 139);
-        } else if (this.number == 5) {
-          // Dark red
-          fill(139, 0, 0);
-        } else if (this.number == 6) {
-          // Sea green
-          fill(32, 178, 170);
-        } else if (this.number == 7) {
-          // Black
-          fill(0);
-        } else if (this.number == 8) {
-          // Grey
-          fill(100);
-        }
+        fill(this.colors[this.number]);
         noStroke();
         textAlign(CENTER);
         textSize(18);

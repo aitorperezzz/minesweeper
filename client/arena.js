@@ -35,7 +35,7 @@ class Arena {
           this.y + j * this.size,
           this.size,
           i,
-          j
+          j,
         );
         this.squares[i].push(square);
       }
