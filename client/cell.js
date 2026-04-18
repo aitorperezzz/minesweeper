@@ -24,6 +24,8 @@ class Cell {
   }
 
   draw(x, y, size) {
+    push();
+
     // if not reveled, paint it darker and with solid border
     if (!this.revealed) {
       stroke(50);
@@ -36,23 +38,24 @@ class Cell {
         fill(255, 0, 0);
         ellipse(x + size / 2, y + size / 2, size / 2, size / 2);
       }
-      return;
+    } else {
+      // mine
+      if (this.mine) {
+        // Draw an ellipse simulating the mine
+        noStroke();
+        fill(0);
+        ellipse(x + size / 2, y + size / 2, size / 2, size / 2);
+      } else if (this.number != 0) {
+        // Write the number with the correct color
+        fill(colors[this.number]);
+        noStroke();
+        textAlign(CENTER);
+        textSize(size * 0.75);
+        textStyle(BOLD);
+        text(this.number, x + size / 2, y + size * (3 / 4));
+      }
     }
 
-    // mine
-    if (this.mine) {
-      // Draw an ellipse simulating the mine
-      noStroke();
-      fill(0);
-      ellipse(x + size / 2, y + size / 2, size / 2, size / 2);
-    } else if (this.number != 0) {
-      // Write the number with the correct color
-      fill(colors[this.number]);
-      noStroke();
-      textAlign(CENTER);
-      textSize(size * 0.75);
-      textStyle(BOLD);
-      text(this.number, x + size / 2, y + size * (3 / 4));
-    }
+    pop();
   }
 }

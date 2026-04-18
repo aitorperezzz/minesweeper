@@ -12,27 +12,27 @@ function computeSizes() {
   let availableHeight = rect.height;
 
   let canvasRatio = 2;
-  let screenProportion = 0.9;
+  let screenProportion = 0.95;
 
   if (availableHeight * canvasRatio < availableWidth) {
     // Decide according to vertical space
-    sizes.canvasy = screenProportion * availableHeight;
-    sizes.canvasx = sizes.canvasy * canvasRatio;
+    sizes.canvasHeight = screenProportion * availableHeight;
+    sizes.canvasWidth = sizes.canvasHeight * canvasRatio;
   } else {
     // Decide according to horizontal space
-    sizes.canvasx = screenProportion * availableWidth;
-    sizes.canvasy = sizes.canvasx / canvasRatio;
+    sizes.canvasWidth = screenProportion * availableWidth;
+    sizes.canvasHeight = sizes.canvasWidth / canvasRatio;
   }
 }
 
 // p5js specific functions
 function setup() {
   computeSizes();
-  let canvas = createCanvas(sizes.canvasx, sizes.canvasy);
+  let canvas = createCanvas(sizes.canvasWidth, sizes.canvasHeight);
   canvas.parent("sketch-holder");
 
   // Initialize the global variables
-  arena = new Arena(sizes.canvasx, sizes.canvasy);
+  arena = new Arena(sizes.canvasWidth, sizes.canvasHeight);
 }
 
 function draw() {
@@ -63,6 +63,6 @@ function playExpert() {
 
 function windowResized() {
   computeSizes();
-  resizeCanvas(sizes.canvasx, sizes.canvasy);
-  arena.resize(sizes.canvasx, sizes.canvasy);
+  resizeCanvas(sizes.canvasWidth, sizes.canvasHeight);
+  arena.resize(sizes.canvasWidth, sizes.canvasHeight);
 }
