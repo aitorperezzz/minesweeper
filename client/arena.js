@@ -163,7 +163,9 @@ class Arena {
   flag(mx, my) {
     let cell = this.getClickedCell(mx, my);
     if (cell != undefined) {
-      cell.flag = !cell.flag;
+      if (!cell.revealed) {
+        cell.flag = !cell.flag;
+      }
     }
   }
 
