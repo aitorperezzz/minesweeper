@@ -26,19 +26,13 @@ class Arena {
     // compute generic sizes in the arena
     this.computeArenaSizes();
 
-    // create the placeholders for the grid of cells
-    this.cells = [];
-
-    // no game for the moment
-    this.mode = undefined;
-
     // counters and displays
     this.faceDisplay = new IconDisplay();
     this.timerDisplay = new TimerDisplay();
     this.minesLeftDisplay = new NumberDisplay();
 
-    // the total number of cells that are flagged
-    this.numFlagged = 0;
+    // The game starts in beginner mode
+    this.play("beginner");
   }
 
   play(mode) {
@@ -82,12 +76,16 @@ class Arena {
       }
     }
 
-    // reset the number of cells flagged
+    // Number of cells that have been flagged is zero
     this.numFlagged = 0;
+    // Update counter
     this.minesLeftDisplay.updateNumber(this.mines);
 
-    // Start running the time
-    this.timerDisplay.start();
+    // Counter indicating if the first click has happened
+    this.firstClickHappened = false;
+
+    // Reset the timer
+    this.timerDisplay.reset();
   }
 
   computeArenaSizes() {
@@ -185,6 +183,12 @@ class Arena {
       // if the cell is a mine, we need to end the game
       this.lose();
     } else {
+      // If this is the first reveal, start the timer
+      if (!this.firstClickHappened) {
+        this.firstClickHappened = true;
+        this.timerDisplay.start();
+      }
+
       // flood fill the cell
       this.flood(i, j);
       // Check if the user has won

@@ -1,8 +1,7 @@
 class TimerDisplay extends NumberDisplay {
   constructor() {
     super();
-    this.begin = 0;
-    this.running = false;
+    this.reset();
   }
 
   start() {
@@ -12,6 +11,12 @@ class TimerDisplay extends NumberDisplay {
 
   stop() {
     this.running = false;
+  }
+
+  reset() {
+    this.begin = 0;
+    this.running = false;
+    this.updateNumber(0);
   }
 
   updateTime() {
