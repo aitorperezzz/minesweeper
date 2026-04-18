@@ -210,8 +210,8 @@ class Arena {
     // Stop the time
     this.timerDisplay.stop();
     // TODO print a message indicating that the user has lost
-    // Reveal the arena completely
-    this.revealAll();
+    // Reveal all the cells with mines
+    this.revealAllMines();
   }
 
   win() {
@@ -330,11 +330,13 @@ class Arena {
     return undefined;
   }
 
-  revealAll() {
+  revealAllMines() {
     // Reveal every cell
     for (let i = 0; i < this.inum; i++) {
       for (let j = 0; j < this.jnum; j++) {
-        this.cells[i][j].revealed = true;
+        if (this.cells[i][j].mine) {
+          this.cells[i][j].revealed = true;
+        }
       }
     }
   }
