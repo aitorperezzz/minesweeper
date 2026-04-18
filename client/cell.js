@@ -1,13 +1,13 @@
-// The cell will have a different color depending on the number
+// Classic Windows 95 Minesweeper colors
 const colors = {
-  1: [123, 104, 238], // Light blue
-  2: [50, 205, 50], // Green
+  1: [0, 0, 255], // Blue
+  2: [0, 128, 0], // Green
   3: [255, 0, 0], // Red
-  4: [0, 0, 139], // Dark blue
-  5: [139, 0, 0], // Dark red
-  6: [32, 178, 170], // Sea green
+  4: [0, 0, 128], // Dark blue
+  5: [128, 0, 0], // Dark red
+  6: [0, 128, 128], // Dark cyan
   7: [0, 0, 0], // Black
-  8: [100, 100, 100], // Grey
+  8: [128, 128, 128], // Gray
 };
 
 // Internal representation of a cell
@@ -50,9 +50,9 @@ class Cell {
       fill(colors[this.number]);
       noStroke();
       textAlign(CENTER);
-      textSize(18);
+      textSize(size * 0.75);
       textStyle(BOLD);
-      text(this.number, x + size / 2, y + size * (2 / 3));
+      text(this.number, x + size / 2, y + size * (3 / 4));
     }
   }
 }
