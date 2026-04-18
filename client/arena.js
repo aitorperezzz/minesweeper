@@ -1,88 +1,123 @@
+// Size of the grid and number of mines to place depending
+// on the difficulty
+const arenaConfig = {
+  beginner: {
+    i: 9,
+    j: 9,
+    mines: 10,
+  },
+  intermediate: {
+    i: 16,
+    j: 16,
+    mines: 40,
+  },
+  expert: {
+    i: 30,
+    j: 16,
+    mines: 99,
+  },
+};
+
 class Arena {
-  // This class receives a mode and creates some space for the
-  // squares inside the canvas
-  constructor(mode) {
-    this.size = 30;
-    if (mode == "mode1") {
-      this.xnum = 9;
-      this.ynum = 9;
-      this.numMines = 10;
-    } else if (mode == "mode2") {
-      this.xnum = 16;
-      this.ynum = 16;
-      this.numMines = 40;
-    } else if (mode == "mode3") {
-      this.xnum = 30;
-      this.ynum = 16;
-      this.numMines = 99;
-    }
+  constructor(canvasx, canvasy) {
+    // Keep a copy of the canvas dimensions
+    this.canvasx = canvasx;
+    this.canvasy = canvasy;
+    // the size of the cells can already be computed
+    this.computeCellSize();
 
-    // The number of squares that have been revealed
-    this.revealedNum = 0;
-    this.notMines = this.xnum * this.ynum - this.numMines;
+    // create the placeholders for the grid of cells
+    this.cells = [];
 
-    //this.numSquares = this.xnum * this.ynum;
-    this.x = (width - this.xnum * this.size) / 2;
-    this.y = 100 + (height - 100 - this.ynum * this.size) / 2;
+    // no game for the moment
+    this.mode = undefined;
+  }
 
-    // Create a grid with the appropriate number of squares
-    this.squares = [];
-    for (let i = 0; i < this.xnum; i++) {
-      this.squares.push([]);
-      for (let j = 0; j < this.ynum; j++) {
-        let square = new Square(
-          this.x + i * this.size,
-          this.y + j * this.size,
-          this.size,
-          i,
-          j
-        );
-        this.squares[i].push(square);
+  play(mode) {
+    console.log("Starting game in mode " + mode);
+    this.mode = mode;
+
+    // configuration depending on the mode
+    let config = arenaConfig[mode];
+    this.inum = config.i;
+    this.jnum = config.j;
+    this.mines = config.mines;
+
+    // recompute the initial coordinates of the grid
+    this.computeArenaSize();
+
+    // Create a grid with the appropriate number of cells
+    this.cells = [];
+    for (let i = 0; i < this.inum; i++) {
+      this.cells.push([]);
+      for (let j = 0; j < this.jnum; j++) {
+        this.cells[i].push(new Cell(i, j));
       }
     }
 
-    // Populate some of the squares with the appropriate number of mines
+    // Populate some of the cells with the appropriate number of mines
     let minesPlaced = 0;
-    while (minesPlaced < this.numMines) {
-      let iCandidate = int(random(0, this.xnum));
-      let jCandidate = int(random(0, this.ynum));
-      if (this.squares[iCandidate][jCandidate].mine == false) {
-        // Make this square a mine and update the number of mines placed
-        this.squares[iCandidate][jCandidate].mine = true;
+    while (minesPlaced < this.mines) {
+      let iCandidate = int(random(0, this.inum));
+      let jCandidate = int(random(0, this.jnum));
+      if (this.cells[iCandidate][jCandidate].mine == false) {
+        // Make this cell a mine and update the number of mines placed
+        this.cells[iCandidate][jCandidate].mine = true;
         minesPlaced++;
       }
     }
 
-    // Calculate the number of surrounding mines for each square
-    for (let i = 0; i < this.xnum; i++) {
-      for (let j = 0; j < this.ynum; j++) {
-        this.assignNumber(this.squares[i][j]);
+    // Calculate the number of surrounding mines for each cell
+    for (let i = 0; i < this.inum; i++) {
+      for (let j = 0; j < this.jnum; j++) {
+        this.assignNumber(i, j);
       }
     }
   }
 
-  assignNumber(square) {
-    // Receives a square and assigns the number of mines
+  computeCellSize() {
+    // I want that, even if the user changes mode, that the cells remain
+    // of the same size. This is why it makes sense to compute the sizes
+    // of the cells in the expert mode, which is the most restrictive.
+    let config = arenaConfig.expert;
+    // ratio is the width divided by the height
+    let ratio = config.i / config.j;
+    if (ratio * this.canvasy < this.canvasx) {
+      // Decide according to vertical space
+      this.cellSize = this.canvasy / config.j;
+    } else {
+      // Decide according to horizontal space
+      this.cellSize = this.canvasx / config.i;
+    }
+  }
+
+  computeArenaSize() {
+    this.x = (this.canvasx - this.inum * this.cellSize) / 2;
+    this.y = (this.canvasy - this.jnum * this.cellSize) / 2;
+  }
+
+  resize(canvasx, canvasy) {
+    this.canvasx = canvasx;
+    this.canvasy = canvasy;
+    this.computeCellSize();
+    if (this.mode != undefined) {
+      this.computeArenaSize();
+    }
+  }
+
+  assignNumber(i, j) {
+    // Receives a cell and assigns the number of mines
     // surrounding it
-    if (square.mine == false) {
+
+    let cell = this.cells[i][j];
+    if (cell.mine == false) {
       // In this case we have to assign a number
-      for (let i = -1; i < 2; i++) {
-        for (let j = -1; j < 2; j++) {
-          let xIndex = square.i + i;
-          let yIndex = square.j + j;
-
-          let accesible =
-            xIndex >= 0 &&
-            xIndex < this.xnum &&
-            yIndex >= 0 &&
-            yIndex < this.ynum;
-          let notSame = xIndex != square.i || yIndex != square.j;
-
-          if (accesible && notSame) {
-            // The square is accesible and different from the one being analysed, so
-            // check if it has a mine and update number
-            if (this.squares[xIndex][yIndex].mine) {
-              square.number++;
+      for (let di = -1; di <= 1; di++) {
+        for (let dj = -1; dj <= 1; dj++) {
+          if (di === 0 && dj === 0) continue;
+          if (this.isAccessible(i + di, j + dj)) {
+            if (this.cells[i + di][j + dj].mine) {
+              cell.number++;
             }
           }
         }
@@ -90,83 +125,140 @@ class Arena {
     }
   }
 
-  display() {
-    // Call the draw function for each square
-    for (let i = 0; i < this.xnum; i++) {
-      for (let j = 0; j < this.ynum; j++) {
-        this.squares[i][j].draw();
-      }
-    }
-  }
-
-  isClicked(mx, my) {
-    // Receives the mouse location and decides if the arena has been clicked
-    let xClicked = this.x < mx && mx < this.x + this.xnum * this.size;
-    let yClicked = this.y < my && my < this.y + this.ynum * this.size;
-    return xClicked && yClicked;
-  }
-
-  squareClicked(mx, my) {
-    // receives mouse location and returns the square that has been clicked
-    for (let i = 0; i < this.xnum; i++) {
-      for (let j = 0; j < this.ynum; j++) {
-        if (this.squares[i][j].isClicked(mx, my)) {
-          return this.squares[i][j];
-        }
-      }
-    }
-  }
-
-  reveal() {
-    // Reveal every square
-    for (let i = 0; i < this.xnum; i++) {
-      for (let j = 0; j < this.ynum; j++) {
-        this.squares[i][j].revealed = true;
-      }
-    }
-  }
-
-  flood(square) {
-    // Flood the surroundings of the given square, which we know does not
-    // have neighbors
-    square.revealed = true;
-
-    for (let i = -1; i < 2; i++) {
-      for (let j = -1; j < 2; j++) {
-        let xIndex = square.i + i;
-        let yIndex = square.j + j;
-        let accesible =
-          xIndex >= 0 &&
-          xIndex < this.xnum &&
-          yIndex >= 0 &&
-          yIndex < this.ynum;
-        let notSame = xIndex != square.i || yIndex != square.j;
-
-        if (accesible && notSame) {
-          // I can access it, so get the square
-          let neighbor = this.squares[xIndex][yIndex];
-          if (neighbor.number == 0 && !neighbor.revealed) {
-            // Call flood recursively
-            this.flood(neighbor);
-          } else if (neighbor.number != 0 && !neighbor.revealed) {
-            // Just reveal it and update the number of revealed squares
-            neighbor.revealed = true;
+  reveal(i, j) {
+    if (this.cells[i][j].mine) {
+      // if the cell is a mine, we need to end the game
+      this.lose();
+    } else {
+      // flood fill the cell
+      this.flood(i, j);
+      // Check if the user has won
+      for (let i = 0; i < this.inum; i++) {
+        for (let j = 0; j < this.jnum; j++) {
+          if (!this.cells[i][j].mine && !this.cells[i][j].revealed) {
+            // Player still has not won
+            return;
           }
         }
       }
+      // At this point, the user has won
+      this.win();
     }
   }
 
-  updateRevealed() {
-    // Count the number of squares that have been revealed
-    let number = 0;
-    for (let i = 0; i < this.xnum; i++) {
-      for (let j = 0; j < this.ynum; j++) {
-        if (this.squares[i][j].revealed) {
-          number++;
+  lose() {
+    console.log("Lose");
+    // TODO print a message indicating that the user has lost
+    // Reveal the arena completely
+    this.revealAll();
+  }
+
+  win() {
+    console.log("Win");
+    // TODO print a message indicating that the user has won
+  }
+
+  // The user attempts to flag (or unflag)
+  // at the given coordinates
+  flag(mx, my) {
+    let cell = this.getClickedCell(mx, my);
+    if (cell != undefined) {
+      cell.flag = !cell.flag;
+    }
+  }
+
+  // The player attempts to click (reveal)
+  // in the given coordinates
+  click(mx, my) {
+    let cell = this.getClickedCell(mouseX, mouseY);
+    if (cell != undefined) {
+      this.reveal(cell.i, cell.j);
+    }
+  }
+
+  draw() {
+    if (this.mode == undefined) {
+      background(0);
+    } else {
+      // Call the draw function for each cell
+      for (let i = 0; i < this.inum; i++) {
+        for (let j = 0; j < this.jnum; j++) {
+          this.cells[i][j].draw(
+            this.x + i * this.cellSize,
+            this.y + j * this.cellSize,
+            this.cellSize,
+          );
         }
       }
     }
-    this.revealedNum = number;
+  }
+
+  getClickedCell(mx, my) {
+    // general boundaries of the arena
+    if (mx < this.x || this.x + this.cellSize * this.inum < mx) {
+      return undefined;
+    }
+    if (my < this.y || this.y + this.cellSize * this.jnum < my) {
+      return undefined;
+    }
+
+    // get the coordinate of the cell
+    for (let i = 0; i < this.inum; i++) {
+      for (let j = 0; j < this.jnum; j++) {
+        let clicked =
+          this.x + i * this.cellSize < mx &&
+          mx < this.x + (i + 1) * this.cellSize &&
+          this.y + j * this.cellSize < my &&
+          my < this.y + (j + 1) * this.cellSize;
+        if (clicked) {
+          return this.cells[i][j];
+        }
+      }
+    }
+
+    return undefined;
+  }
+
+  revealAll() {
+    // Reveal every cell
+    for (let i = 0; i < this.inum; i++) {
+      for (let j = 0; j < this.jnum; j++) {
+        this.cells[i][j].revealed = true;
+      }
+    }
+  }
+
+  flood(i, j) {
+    // Ignore if the cell is not accesible
+    if (!this.isAccessible(i, j)) {
+      return;
+    }
+
+    // Ignore if the cell is already revealed
+    if (this.cells[i][j].revealed) {
+      return;
+    }
+
+    // This is a special condition for flood fill in the case of minesweeper:
+    // the user clicks. If the cell has:
+    // - a zero: reveal the cell AND expand to the neighbors
+    // - another number: reveal the cell but DO NOT EXPAND
+
+    // flood the cell itself
+    this.cells[i][j].revealed = true;
+
+    // If it has a zero, try to flood all the 8 neighbors
+    if (this.cells[i][j].number == 0) {
+      for (let di = -1; di <= 1; di++) {
+        for (let dj = -1; dj <= 1; dj++) {
+          if (di === 0 && dj === 0) continue;
+          this.flood(i + di, j + dj);
+        }
+      }
+    }
+  }
+
+  isAccessible(i, j) {
+    return i >= 0 && i < this.inum && j >= 0 && j < this.jnum;
   }
 }

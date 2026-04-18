@@ -1,0 +1,99 @@
+/* Fondo general con aire Windows 95 */
+html,
+body {
+  margin: 0;
+  padding: 0;
+  min-height: 100%;
+  font-family: "MS Sans Serif", Tahoma, Verdana, sans-serif;
+  background: #c0c0c0;
+  color: #000;
+}
+
+/* Centrar todo el contenido en la página */
+body {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  padding: 32px 16px;
+  box-sizing: border-box;
+}
+
+/* Zona de botones */
+#button-area {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-items: center;
+  margin-bottom: 24px;
+  padding: 14px 18px;
+  background: #c0c0c0;
+  border-top: 2px solid #ffffff;
+  border-left: 2px solid #ffffff;
+  border-right: 2px solid #7b7b7b;
+  border-bottom: 2px solid #7b7b7b;
+  box-shadow: 1px 1px 0 #00000020;
+}
+
+/* Botones estilo sencillo retro */
+.button {
+  appearance: none;
+  border: none;
+  background: #c0c0c0;
+  color: #000;
+  font-family: inherit;
+  font-size: 15px;
+  padding: 10px 18px;
+  min-width: 130px;
+  cursor: pointer;
+
+  border-top: 2px solid #ffffff;
+  border-left: 2px solid #ffffff;
+  border-right: 2px solid #7b7b7b;
+  border-bottom: 2px solid #7b7b7b;
+
+  box-sizing: border-box;
+}
+
+.button:hover {
+  background: #d6d6d6;
+}
+
+.button:active {
+  border-top: 2px solid #7b7b7b;
+  border-left: 2px solid #7b7b7b;
+  border-right: 2px solid #ffffff;
+  border-bottom: 2px solid #ffffff;
+  background: #b8b8b8;
+}
+
+.button:focus {
+  outline: 1px dotted #000;
+  outline-offset: -4px;
+}
+
+/* Contenedor del canvas */
+#sketch-holder {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 14px;
+  background: #c0c0c0;
+
+  border-top: 2px solid #ffffff;
+  border-left: 2px solid #ffffff;
+  border-right: 2px solid #7b7b7b;
+  border-bottom: 2px solid #7b7b7b;
+}
+
+/* El canvas de p5 */
+#sketch-holder canvas {
+  display: block;
+  margin: 0 auto;
+  border-top: 2px solid #7b7b7b;
+  border-left: 2px solid #7b7b7b;
+  border-right: 2px solid #ffffff;
+  border-bottom: 2px solid #ffffff;
+  background: #bdbdbd;
+}
