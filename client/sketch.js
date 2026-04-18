@@ -5,21 +5,22 @@ let arena;
 let sizes = {};
 
 function computeSizes() {
-  // canvas ratio is width divided by height
-  let canvasRatio = 2;
+  const container = document.getElementById("sketch-holder");
+  const rect = container.getBoundingClientRect();
 
-  // the amount of the screen (vertically or horizontally)
-  // that the application will occupy
+  let availableWidth = rect.width;
+  let availableHeight = rect.height;
+
+  let canvasRatio = 2;
   let screenProportion = 0.9;
 
-  // Compute the sizes of the p5js grid
-  if (windowHeight * canvasRatio < windowWidth) {
+  if (availableHeight * canvasRatio < availableWidth) {
     // Decide according to vertical space
-    sizes.canvasy = screenProportion * windowHeight;
+    sizes.canvasy = screenProportion * availableHeight;
     sizes.canvasx = sizes.canvasy * canvasRatio;
   } else {
     // Decide according to horizontal space
-    sizes.canvasx = screenProportion * windowWidth;
+    sizes.canvasx = screenProportion * availableWidth;
     sizes.canvasy = sizes.canvasx / canvasRatio;
   }
 }

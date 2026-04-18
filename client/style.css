@@ -1,32 +1,40 @@
-/* Fondo general con aire Windows 95 */
+/* General Windows 95-like background */
 html,
 body {
   margin: 0;
   padding: 0;
-  min-height: 100%;
+  height: 100%;
   font-family: "MS Sans Serif", Tahoma, Verdana, sans-serif;
   background: #c0c0c0;
   color: #000;
+  box-sizing: border-box;
 }
 
-/* Centrar todo el contenido en la página */
+*,
+*::before,
+*::after {
+  box-sizing: inherit;
+}
+
+/* Main page layout */
 body {
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: flex-start;
-  padding: 32px 16px;
-  box-sizing: border-box;
+  height: 100vh;
+  padding: 16px;
+  overflow: hidden;
 }
 
-/* Zona de botones */
+/* Button area */
 #button-area {
+  flex: 0 0 auto;
   display: flex;
   gap: 12px;
   flex-wrap: wrap;
   justify-content: center;
   align-items: center;
-  margin-bottom: 24px;
+  margin-bottom: 16px;
   padding: 14px 18px;
   background: #c0c0c0;
   border-top: 2px solid #ffffff;
@@ -34,9 +42,10 @@ body {
   border-right: 2px solid #7b7b7b;
   border-bottom: 2px solid #7b7b7b;
   box-shadow: 1px 1px 0 #00000020;
+  max-width: 100%;
 }
 
-/* Botones estilo sencillo retro */
+/* Simple retro buttons */
 .button {
   appearance: none;
   border: none;
@@ -47,13 +56,10 @@ body {
   padding: 10px 18px;
   min-width: 130px;
   cursor: pointer;
-
   border-top: 2px solid #ffffff;
   border-left: 2px solid #ffffff;
   border-right: 2px solid #7b7b7b;
   border-bottom: 2px solid #7b7b7b;
-
-  box-sizing: border-box;
 }
 
 .button:hover {
@@ -73,23 +79,28 @@ body {
   outline-offset: -4px;
 }
 
-/* Contenedor del canvas */
+/* Canvas container: takes all remaining vertical space */
 #sketch-holder {
+  flex: 1 1 auto;
+  width: 100%;
+  min-height: 0;
   display: flex;
   justify-content: center;
   align-items: center;
   padding: 14px;
   background: #c0c0c0;
-
   border-top: 2px solid #ffffff;
   border-left: 2px solid #ffffff;
   border-right: 2px solid #7b7b7b;
   border-bottom: 2px solid #7b7b7b;
+  overflow: hidden;
 }
 
-/* El canvas de p5 */
+/* p5 canvas */
 #sketch-holder canvas {
   display: block;
+  max-width: 100%;
+  max-height: 100%;
   margin: 0 auto;
   border-top: 2px solid #7b7b7b;
   border-left: 2px solid #7b7b7b;
