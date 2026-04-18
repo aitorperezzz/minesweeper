@@ -177,18 +177,42 @@ class Arena {
   }
 
   draw() {
+    // The background of the complete canvas is always there
+    background(180);
+
     if (this.mode == undefined) {
-      background(0);
-    } else {
-      // Call the draw function for each cell
-      for (let i = 0; i < this.inum; i++) {
-        for (let j = 0; j < this.jnum; j++) {
-          this.cells[i][j].draw(
-            this.x + i * this.cellSize,
-            this.y + j * this.cellSize,
-            this.cellSize,
-          );
-        }
+      return;
+    }
+
+    // Draw soft lines all over
+    stroke(100);
+    strokeWeight(1.0);
+    noFill();
+    for (let i = 0; i < this.inum + 1; i++) {
+      line(
+        this.x + i * this.cellSize,
+        this.y,
+        this.x + i * this.cellSize,
+        this.y + this.cellSize * this.jnum,
+      );
+    }
+    for (let j = 0; j < this.jnum + 1; j++) {
+      line(
+        this.x,
+        this.y + j * this.cellSize,
+        this.x + this.inum * this.cellSize,
+        this.y + j * this.cellSize,
+      );
+    }
+
+    // Call the draw function for each cell
+    for (let i = 0; i < this.inum; i++) {
+      for (let j = 0; j < this.jnum; j++) {
+        this.cells[i][j].draw(
+          this.x + i * this.cellSize,
+          this.y + j * this.cellSize,
+          this.cellSize,
+        );
       }
     }
   }

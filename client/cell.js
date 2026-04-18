@@ -24,41 +24,35 @@ class Cell {
   }
 
   draw(x, y, size) {
-    // The background color of a cell is darker if it has not been
-    // revealed
-    stroke(100);
-    strokeWeight(2);
-    if (this.revealed) {
-      fill(190);
-    } else {
-      fill(150);
-    }
-    rect(x, y, size, size);
+    // if not reveled, paint it darker and with solid border
+    if (!this.revealed) {
+      stroke(50);
+      strokeWeight(1.5);
+      fill(140);
+      rect(x, y, size, size);
 
-    // Draw flags if necessary
-    if (this.flag) {
-      noStroke();
-      fill(255, 0, 0);
-      ellipse(x + size / 2, y + size / 2, size / 2, size / 2);
-    }
-
-    // Draw the rest of the things
-    if (this.revealed) {
-      // Draw the content
-      if (this.mine) {
-        // Draw an ellipse simulating the mine
+      if (this.flag) {
         noStroke();
-        fill(0);
+        fill(255, 0, 0);
         ellipse(x + size / 2, y + size / 2, size / 2, size / 2);
-      } else if (this.number != 0) {
-        // Draw the number
-        fill(colors[this.number]);
-        noStroke();
-        textAlign(CENTER);
-        textSize(18);
-        textStyle(BOLD);
-        text(this.number, x + size / 2, y + size * (2 / 3));
       }
+      return;
+    }
+
+    // mine
+    if (this.mine) {
+      // Draw an ellipse simulating the mine
+      noStroke();
+      fill(0);
+      ellipse(x + size / 2, y + size / 2, size / 2, size / 2);
+    } else if (this.number != 0) {
+      // Write the number with the correct color
+      fill(colors[this.number]);
+      noStroke();
+      textAlign(CENTER);
+      textSize(18);
+      textStyle(BOLD);
+      text(this.number, x + size / 2, y + size * (2 / 3));
     }
   }
 }
