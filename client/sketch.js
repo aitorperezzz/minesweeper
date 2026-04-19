@@ -30,6 +30,7 @@ function setup() {
   computeSizes();
   let canvas = createCanvas(sizes.canvasWidth, sizes.canvasHeight);
   canvas.parent("sketch-holder");
+  canvas.elt.addEventListener("contextmenu", (event) => event.preventDefault());
 
   // Initialize the global variables
   arena = new Arena(sizes.canvasWidth, sizes.canvasHeight);
@@ -39,14 +40,16 @@ function draw() {
   arena.draw();
 }
 
-function mousePressed() {
-  arena.click(mouseX, mouseY);
-}
+function mousePressed(event) {
+  const isSecondaryClick =
+    mouseButton === RIGHT || event.button === 2 || event.ctrlKey;
 
-function keyPressed() {
-  if (key == "f") {
+  if (isSecondaryClick) {
     arena.flag(mouseX, mouseY);
+    return false;
   }
+
+  arena.click(mouseX, mouseY);
 }
 
 function playBeginner() {

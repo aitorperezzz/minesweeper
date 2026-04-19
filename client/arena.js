@@ -237,7 +237,7 @@ class Arena {
   // The player attempts to click (reveal)
   // in the given coordinates
   click(mx, my) {
-    let cell = this.getClickedCell(mouseX, mouseY);
+    let cell = this.getClickedCell(mx, my);
     if (cell != undefined) {
       this.reveal(cell.i, cell.j);
     }
