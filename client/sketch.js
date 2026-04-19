@@ -8,9 +8,6 @@ let sizes = {};
 // Variables to handle icons
 let icons = {};
 
-// Buttons pressed
-let buttonPressedPrimary = false;
-
 // Number of cells occupied by the top header
 const numCellsHeader = 3;
 // Proportion of the canvas inside its container
@@ -120,36 +117,6 @@ async function setup() {
 
 function draw() {
   arena.draw();
-}
-
-function mousePressed(event) {
-  const isSecondaryClick =
-    mouseButton.right || event.button === 2 || event.ctrlKey;
-  const isPrimaryClick =
-    !isSecondaryClick && (mouseButton.left || event.button === 0);
-
-  if (isPrimaryClick) {
-    buttonPressedPrimary = true;
-    arena.press(mouseX, mouseY);
-  } else if (isSecondaryClick) {
-    arena.flag(mouseX, mouseY);
-    return false;
-  }
-}
-
-function mouseReleased() {
-  if (buttonPressedPrimary) {
-    buttonPressedPrimary = false;
-    arena.release(mouseX, mouseY);
-  }
-}
-
-function keyPressed(event) {
-  const isFindShortcut = event.ctrlKey || event.metaKey;
-  if (!isFindShortcut && key.toLowerCase() === "f") {
-    arena.flag(mouseX, mouseY);
-    return false;
-  }
 }
 
 function playBeginner() {
