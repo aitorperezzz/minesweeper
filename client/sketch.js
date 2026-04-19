@@ -20,15 +20,45 @@ const panelNumberHeight = 23;
 
 function computeSizes() {
   const container = document.getElementById("sketch-holder");
-  const rect = container.getBoundingClientRect();
+  const containerStyles = getComputedStyle(container);
+  const canvas = document.querySelector("#sketch-holder canvas");
+  const canvasStyles = canvas ? getComputedStyle(canvas) : undefined;
 
   // Compute the optimal canvas ratio
   let expertConfig = arenaConfig.expert;
   // Ratio will be width divided by height
   let canvasRatio = expertConfig.i / (expertConfig.j + numCellsHeader);
 
-  let availableWidth = rect.width;
-  let availableHeight = rect.height;
+  const containerHorizontalChrome =
+    parseFloat(containerStyles.paddingLeft) +
+    parseFloat(containerStyles.paddingRight) +
+    parseFloat(containerStyles.borderLeftWidth) +
+    parseFloat(containerStyles.borderRightWidth);
+  const containerVerticalChrome =
+    parseFloat(containerStyles.paddingTop) +
+    parseFloat(containerStyles.paddingBottom) +
+    parseFloat(containerStyles.borderTopWidth) +
+    parseFloat(containerStyles.borderBottomWidth);
+  const canvasHorizontalChrome = canvasStyles
+    ? parseFloat(canvasStyles.borderLeftWidth) +
+      parseFloat(canvasStyles.borderRightWidth)
+    : 0;
+  const canvasVerticalChrome = canvasStyles
+    ? parseFloat(canvasStyles.borderTopWidth) +
+      parseFloat(canvasStyles.borderBottomWidth)
+    : 0;
+
+  let availableWidth =
+    container.getBoundingClientRect().width -
+    containerHorizontalChrome -
+    canvasHorizontalChrome;
+  let availableHeight =
+    container.getBoundingClientRect().height -
+    containerVerticalChrome -
+    canvasVerticalChrome;
+
+  availableWidth = Math.max(0, availableWidth);
+  availableHeight = Math.max(0, availableHeight);
 
   if (availableHeight * canvasRatio < availableWidth) {
     // Decide according to vertical space
@@ -102,6 +132,7 @@ async function setup() {
   let canvas = createCanvas(sizes.canvasWidth, sizes.canvasHeight);
   canvas.parent("sketch-holder");
   canvas.elt.addEventListener("contextmenu", (event) => event.preventDefault());
+  installCanvasInputHandlers(canvas.elt);
 
   // Initialize the global variables
   arena = new Arena(sizes.canvasWidth, sizes.canvasHeight);
@@ -110,6 +141,10 @@ async function setup() {
   if ("ResizeObserver" in window) {
     sketchHolderObserver = new ResizeObserver(resizeGame);
     sketchHolderObserver.observe(holder);
+  }
+
+  if (window.visualViewport) {
+    window.visualViewport.addEventListener("resize", scheduleResizeGame);
   }
 
   scheduleResizeGame();
