@@ -6,11 +6,10 @@ let sketchHolderObserver;
 let sizes = {};
 
 // Variables to handle icons
-let faceHappy, faceSurprised, faceLose, faceWin;
+let icons = {};
 
 // Buttons pressed
 let buttonPressedPrimary = false;
-let buttonPressedSecondary = false;
 
 // Number of cells occupied by the top header
 const numCellsHeader = 3;
@@ -18,6 +17,9 @@ const numCellsHeader = 3;
 const screenProportion = 0.95;
 // The margin of the displays inside their respective containers
 const displaysProportion = 0.8;
+// Panel number dimensions
+const panelNumberWidth = 13;
+const panelNumberHeight = 23;
 
 function computeSizes() {
   const container = document.getElementById("sketch-holder");
@@ -62,10 +64,42 @@ function scheduleResizeGame() {
 
 // p5js specific functions
 async function setup() {
-  faceHappy = await loadImage("icons/happy.png");
-  faceSurprised = await loadImage("icons/surprised.png");
-  faceLose = await loadImage("icons/lose.png");
-  faceWin = await loadImage("icons/win.png");
+  icons = {
+    happy: await loadImage("icons/happy.png"),
+    happyPressed: await loadImage("icons/happy_pressed.png"),
+    surprised: await loadImage("icons/surprised.png"),
+    lose: await loadImage("icons/lose.png"),
+    win: await loadImage("icons/win.png"),
+    mine: await loadImage("icons/mine.png"),
+    mineCulprit: await loadImage("icons/mine_culprit.png"),
+    flag: await loadImage("icons/flag.png"),
+    revealed: await loadImage("icons/revealed.png"),
+    revealedNumbers: [
+      undefined,
+      await loadImage("icons/revealed_1.png"),
+      await loadImage("icons/revealed_2.png"),
+      await loadImage("icons/revealed_3.png"),
+      await loadImage("icons/revealed_4.png"),
+      await loadImage("icons/revealed_5.png"),
+      await loadImage("icons/revealed_6.png"),
+      await loadImage("icons/revealed_7.png"),
+      await loadImage("icons/revealed_8.png"),
+    ],
+    unrevealed: await loadImage("icons/unrevealed.png"),
+    numberDash: await loadImage("icons/panel_dash.png"),
+    numbers: [
+      await loadImage("icons/panel_0.png"),
+      await loadImage("icons/panel_1.png"),
+      await loadImage("icons/panel_2.png"),
+      await loadImage("icons/panel_3.png"),
+      await loadImage("icons/panel_4.png"),
+      await loadImage("icons/panel_5.png"),
+      await loadImage("icons/panel_6.png"),
+      await loadImage("icons/panel_7.png"),
+      await loadImage("icons/panel_8.png"),
+      await loadImage("icons/panel_9.png"),
+    ],
+  };
 
   computeSizes();
   let canvas = createCanvas(sizes.canvasWidth, sizes.canvasHeight);
@@ -98,10 +132,7 @@ function mousePressed(event) {
     buttonPressedPrimary = true;
     arena.press(mouseX, mouseY);
   } else if (isSecondaryClick) {
-    buttonPressedSecondary = true;
-  }
-
-  if (isSecondaryClick) {
+    arena.flag(mouseX, mouseY);
     return false;
   }
 }
@@ -110,8 +141,12 @@ function mouseReleased() {
   if (buttonPressedPrimary) {
     buttonPressedPrimary = false;
     arena.release(mouseX, mouseY);
-  } else if (buttonPressedSecondary) {
-    buttonPressedSecondary = false;
+  }
+}
+
+function keyPressed(event) {
+  const isFindShortcut = event.ctrlKey || event.metaKey;
+  if (!isFindShortcut && key.toLowerCase() === "f") {
     arena.flag(mouseX, mouseY);
     return false;
   }

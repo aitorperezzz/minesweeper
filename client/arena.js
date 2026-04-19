@@ -88,7 +88,7 @@ class Arena {
     this.timerDisplay.reset();
 
     // Face resets to happy
-    this.faceDisplay.setIcon(faceHappy);
+    this.faceDisplay.setIcon(icons.happy);
 
     // Flag used to disable all inputs when the user has won or lost
     this.playing = true;
@@ -117,7 +117,8 @@ class Arena {
       (this.headerHeight - this.headerHeight * displaysProportion) / 2;
     // mines left display (left)
     this.minesDisplayHeight = this.headerHeight - 2 * margin;
-    this.minesDisplayWidth = (this.minesDisplayHeight * 3) / 2;
+    this.minesDisplayWidth =
+      (this.minesDisplayHeight * 3 * panelNumberWidth) / panelNumberHeight;
     this.minesDisplayx = this.headerx + margin;
     this.minesDisplayy = this.headery + margin;
     // timer display (right)
@@ -171,6 +172,8 @@ class Arena {
 
   reveal(i, j) {
     if (this.cells[i][j].mine) {
+      // This mine is the culprit
+      this.cells[i][j].mineCulprit = true;
       // if the cell is a mine, we need to end the game
       this.lose();
     } else {
@@ -200,7 +203,7 @@ class Arena {
     console.log("Lose");
     this.timerDisplay.stop();
     this.playing = false;
-    this.faceDisplay.setIcon(faceLose);
+    this.faceDisplay.setIcon(icons.lose);
     // Reveal all the cells with mines
     this.revealAllMines();
   }
@@ -209,7 +212,7 @@ class Arena {
     console.log("Win");
     this.timerDisplay.stop();
     this.playing = false;
-    this.faceDisplay.setIcon(faceWin);
+    this.faceDisplay.setIcon(icons.win);
   }
 
   // The user attempts to flag (or unflag)
@@ -234,7 +237,7 @@ class Arena {
     if (this.playing) {
       let cell = this.getClickedCell(mx, my);
       if (cell != undefined) {
-        this.faceDisplay.setIcon(faceSurprised);
+        this.faceDisplay.setIcon(icons.surprised);
       }
     }
   }
@@ -244,7 +247,7 @@ class Arena {
     if (this.playing) {
       let cell = this.getClickedCell(mx, my);
       if (cell != undefined) {
-        arena.faceDisplay.setIcon(faceHappy);
+        arena.faceDisplay.setIcon(icons.happy);
         this.reveal(cell.i, cell.j);
       }
     }
@@ -276,27 +279,6 @@ class Arena {
 
     if (this.mode == undefined) {
       return;
-    }
-
-    // Draw soft lines all over
-    fill("white");
-    stroke(100);
-    strokeWeight(1.0);
-    for (let i = 0; i < this.inum + 1; i++) {
-      line(
-        this.cellsx + i * this.cellSize,
-        this.cellsy,
-        this.cellsx + i * this.cellSize,
-        this.cellsy + this.cellSize * this.jnum,
-      );
-    }
-    for (let j = 0; j < this.jnum + 1; j++) {
-      line(
-        this.cellsx,
-        this.cellsy + j * this.cellSize,
-        this.cellsx + this.inum * this.cellSize,
-        this.cellsy + j * this.cellSize,
-      );
     }
 
     // Call the draw function for each cell
