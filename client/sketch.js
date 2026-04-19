@@ -4,6 +4,13 @@ let arena;
 // Sizes of several important objects of the game
 let sizes = {};
 
+// Variables to handle icons
+let faceHappy, faceSurprised, faceLose, faceWin;
+
+// Buttons pressed
+let buttonPressedPrimary = false;
+let buttonPressedSecondary = false;
+
 function computeSizes() {
   const container = document.getElementById("sketch-holder");
   const rect = container.getBoundingClientRect();
@@ -26,7 +33,12 @@ function computeSizes() {
 }
 
 // p5js specific functions
-function setup() {
+async function setup() {
+  faceHappy = await loadImage("icons/happy.png");
+  faceSurprised = await loadImage("icons/surprised.png");
+  faceLose = await loadImage("icons/lose.png");
+  faceWin = await loadImage("icons/win.png");
+
   computeSizes();
   let canvas = createCanvas(sizes.canvasWidth, sizes.canvasHeight);
   canvas.parent("sketch-holder");
@@ -42,14 +54,31 @@ function draw() {
 
 function mousePressed(event) {
   const isSecondaryClick =
-    mouseButton === RIGHT || event.button === 2 || event.ctrlKey;
+    mouseButton.right || event.button === 2 || event.ctrlKey;
+  const isPrimaryClick =
+    !isSecondaryClick && (mouseButton.left || event.button === 0);
+
+  if (isPrimaryClick) {
+    buttonPressedPrimary = true;
+    arena.press(mouseX, mouseY);
+  } else if (isSecondaryClick) {
+    buttonPressedSecondary = true;
+  }
 
   if (isSecondaryClick) {
+    return false;
+  }
+}
+
+function mouseReleased() {
+  if (buttonPressedPrimary) {
+    buttonPressedPrimary = false;
+    arena.release(mouseX, mouseY);
+  } else if (buttonPressedSecondary) {
+    buttonPressedSecondary = false;
     arena.flag(mouseX, mouseY);
     return false;
   }
-
-  arena.click(mouseX, mouseY);
 }
 
 function playBeginner() {

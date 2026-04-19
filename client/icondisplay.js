@@ -8,6 +8,16 @@ class IconDisplay {
   }
 
   draw(x, y, width, height) {
-    // TODO
+    if (this.icon == undefined) {
+      return;
+    }
+
+    push();
+    const previousSmoothing = drawingContext.imageSmoothingEnabled;
+    drawingContext.imageSmoothingEnabled = false;
+    imageMode(CORNER);
+    image(this.icon, x, y, width, height);
+    drawingContext.imageSmoothingEnabled = previousSmoothing;
+    pop();
   }
 }

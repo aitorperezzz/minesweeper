@@ -86,6 +86,12 @@ class Arena {
 
     // Reset the timer
     this.timerDisplay.reset();
+
+    // Face resets to happy
+    this.faceDisplay.setIcon(faceHappy);
+
+    // Flag used to disable all inputs when the user has won or lost
+    this.playing = true;
   }
 
   computeArenaSizes() {
@@ -124,7 +130,7 @@ class Arena {
     this.faceDisplayWidth = this.faceDisplayHeight;
     this.faceDisplayx =
       this.headerx + this.headerWidth / 2 - this.faceDisplayWidth / 2;
-    this.faceDisplayy = this.headery + margin + this.faceDisplayHeight / 2;
+    this.faceDisplayy = this.headery + margin;
 
     // inside the grid
 
@@ -207,39 +213,55 @@ class Arena {
 
   lose() {
     console.log("Lose");
-    // Stop the time
     this.timerDisplay.stop();
-    // TODO print a message indicating that the user has lost
+    this.playing = false;
+    this.faceDisplay.setIcon(faceLose);
     // Reveal all the cells with mines
     this.revealAllMines();
   }
 
   win() {
     console.log("Win");
-    // Stop the time
     this.timerDisplay.stop();
-    // TODO print a message indicating that the user has won
+    this.playing = false;
+    this.faceDisplay.setIcon(faceWin);
   }
 
   // The user attempts to flag (or unflag)
   // at the given coordinates
   flag(mx, my) {
-    let cell = this.getClickedCell(mx, my);
-    if (cell != undefined) {
-      if (!cell.revealed) {
-        cell.flag = !cell.flag;
-        this.numFlagged = cell.flag ? this.numFlagged + 1 : this.numFlagged - 1;
-        this.minesLeftDisplay.updateNumber(this.mines - this.numFlagged);
+    if (this.playing) {
+      let cell = this.getClickedCell(mx, my);
+      if (cell != undefined) {
+        if (!cell.revealed) {
+          cell.flag = !cell.flag;
+          this.numFlagged = cell.flag
+            ? this.numFlagged + 1
+            : this.numFlagged - 1;
+          this.minesLeftDisplay.updateNumber(this.mines - this.numFlagged);
+        }
       }
     }
   }
 
-  // The player attempts to click (reveal)
-  // in the given coordinates
-  click(mx, my) {
-    let cell = this.getClickedCell(mx, my);
-    if (cell != undefined) {
-      this.reveal(cell.i, cell.j);
+  // Pressing on the cells area only changes the face
+  press(mx, my) {
+    if (this.playing) {
+      let cell = this.getClickedCell(mx, my);
+      if (cell != undefined) {
+        this.faceDisplay.setIcon(faceSurprised);
+      }
+    }
+  }
+
+  // Releasing the primary button is an attempt to reveal a cell
+  release(mx, my) {
+    if (this.playing) {
+      let cell = this.getClickedCell(mx, my);
+      if (cell != undefined) {
+        arena.faceDisplay.setIcon(faceHappy);
+        this.reveal(cell.i, cell.j);
+      }
     }
   }
 
