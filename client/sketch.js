@@ -1,5 +1,6 @@
 // Main object of the game
 let arena;
+let sketchHolderObserver;
 
 // Sizes of several important objects of the game
 let sizes = {};
@@ -41,6 +42,24 @@ function computeSizes() {
   }
 }
 
+function resizeGame() {
+  computeSizes();
+
+  if (width !== sizes.canvasWidth || height !== sizes.canvasHeight) {
+    resizeCanvas(sizes.canvasWidth, sizes.canvasHeight);
+  }
+
+  if (arena != undefined) {
+    arena.resize(sizes.canvasWidth, sizes.canvasHeight);
+  }
+}
+
+function scheduleResizeGame() {
+  requestAnimationFrame(() => {
+    requestAnimationFrame(resizeGame);
+  });
+}
+
 // p5js specific functions
 async function setup() {
   faceHappy = await loadImage("icons/happy.png");
@@ -55,6 +74,14 @@ async function setup() {
 
   // Initialize the global variables
   arena = new Arena(sizes.canvasWidth, sizes.canvasHeight);
+
+  const holder = document.getElementById("sketch-holder");
+  if ("ResizeObserver" in window) {
+    sketchHolderObserver = new ResizeObserver(resizeGame);
+    sketchHolderObserver.observe(holder);
+  }
+
+  scheduleResizeGame();
 }
 
 function draw() {
@@ -103,7 +130,5 @@ function playExpert() {
 }
 
 function windowResized() {
-  computeSizes();
-  resizeCanvas(sizes.canvasWidth, sizes.canvasHeight);
-  arena.resize(sizes.canvasWidth, sizes.canvasHeight);
+  scheduleResizeGame();
 }
