@@ -11,15 +11,24 @@ let faceHappy, faceSurprised, faceLose, faceWin;
 let buttonPressedPrimary = false;
 let buttonPressedSecondary = false;
 
+// Number of cells occupied by the top header
+const numCellsHeader = 3;
+// Proportion of the canvas inside its container
+const screenProportion = 0.95;
+// The margin of the displays inside their respective containers
+const displaysProportion = 0.8;
+
 function computeSizes() {
   const container = document.getElementById("sketch-holder");
   const rect = container.getBoundingClientRect();
 
+  // Compute the optimal canvas ratio
+  let expertConfig = arenaConfig.expert;
+  // Ratio will be width divided by height
+  let canvasRatio = expertConfig.i / (expertConfig.j + numCellsHeader);
+
   let availableWidth = rect.width;
   let availableHeight = rect.height;
-
-  let canvasRatio = 2;
-  let screenProportion = 0.95;
 
   if (availableHeight * canvasRatio < availableWidth) {
     // Decide according to vertical space

@@ -95,23 +95,25 @@ class Arena {
   }
 
   computeArenaSizes() {
-    const headerProportion = 0.15;
-    const displaysProportion = 0.8;
+    // The cell size simply depends on the width, because the expert mode
+    // needs to occupy the horizontal space fully
+    this.cellSize = this.canvasWidth / arenaConfig.expert.i;
 
     // Sizes of the header
     this.headerWidth = this.canvasWidth;
-    this.headerHeight = this.canvasHeight * headerProportion;
+    this.headerHeight = this.cellSize * numCellsHeader;
     this.headerx = 0;
     this.headery = 0;
     // Sizes of the grid below
-    this.gridWidth = this.headerWidth;
-    this.gridHeight = this.canvasHeight * (1 - headerProportion);
+    this.gridWidth = this.canvasWidth;
+    this.gridHeight = this.cellSize * arenaConfig.expert.j;
     this.gridx = 0;
     this.gridy = this.headerHeight;
 
     // inside the header
 
     // generic margin for the displays
+    
     let margin =
       (this.headerHeight - this.headerHeight * displaysProportion) / 2;
     // mines left display (left)
@@ -131,22 +133,6 @@ class Arena {
     this.faceDisplayx =
       this.headerx + this.headerWidth / 2 - this.faceDisplayWidth / 2;
     this.faceDisplayy = this.headery + margin;
-
-    // inside the grid
-
-    // I want that, even if the user changes mode, that the cells remain
-    // of the same size. This is why it makes sense to compute the sizes
-    // of the cells in the expert mode, which is the most restrictive.
-    let config = arenaConfig.expert;
-    // ratio is the width divided by the height
-    let ratio = config.i / config.j;
-    if (ratio * this.gridHeight < this.gridWidth) {
-      // Decide according to vertical space
-      this.cellSize = this.gridHeight / config.j;
-    } else {
-      // Decide according to horizontal space
-      this.cellSize = this.gridWidth / config.i;
-    }
   }
 
   computeCellsCoordinates() {
