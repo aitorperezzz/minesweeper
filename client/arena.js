@@ -113,7 +113,6 @@ class Arena {
     // inside the header
 
     // generic margin for the displays
-    
     let margin =
       (this.headerHeight - this.headerHeight * displaysProportion) / 2;
     // mines left display (left)
