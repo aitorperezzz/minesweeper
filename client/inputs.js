@@ -141,7 +141,6 @@ function installCanvasInputHandlers(canvasElement) {
 
   canvasElement.addEventListener("contextmenu", (event) => {
     event.preventDefault();
-    ignoreSyntheticMouse();
   });
 }
 
