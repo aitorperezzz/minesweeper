@@ -57,25 +57,6 @@ class Arena {
       }
     }
 
-    // Populate some of the cells with the appropriate number of mines
-    let minesPlaced = 0;
-    while (minesPlaced < this.mines) {
-      let iCandidate = int(random(0, this.inum));
-      let jCandidate = int(random(0, this.jnum));
-      if (this.cells[iCandidate][jCandidate].mine == false) {
-        // Make this cell a mine and update the number of mines placed
-        this.cells[iCandidate][jCandidate].mine = true;
-        minesPlaced++;
-      }
-    }
-
-    // Calculate the number of surrounding mines for each cell
-    for (let i = 0; i < this.inum; i++) {
-      for (let j = 0; j < this.jnum; j++) {
-        this.assignNumber(i, j);
-      }
-    }
-
     // Number of cells that have been flagged is zero
     this.numFlagged = 0;
     // Update counter
@@ -176,18 +157,20 @@ class Arena {
       return;
     }
 
+    // If this is the first reveal, we need to place mines
+    if (!this.firstClickHappened) {
+      this.placeMines(i, j);
+      this.firstClickHappened = true;
+      // Timer starts here
+      this.timerDisplay.start();
+    }
+
     if (this.cells[i][j].mine) {
       // This mine is the culprit
       this.cells[i][j].mineCulprit = true;
       // if the cell is a mine, we need to end the game
       this.lose();
     } else {
-      // If this is the first reveal, start the timer
-      if (!this.firstClickHappened) {
-        this.firstClickHappened = true;
-        this.timerDisplay.start();
-      }
-
       // flood fill the cell
       this.flood(i, j);
       // Check if the user has won
@@ -256,6 +239,32 @@ class Arena {
       if (cell != undefined) {
         arena.faceDisplay.setIcon(icons.happy);
         this.reveal(cell.i, cell.j);
+      }
+    }
+  }
+
+  // Place mines knowing that the user has clicked the provided coordinates
+  placeMines(i, j) {
+    // Populate some of the cells with the appropriate number of mines
+    let minesPlaced = 0;
+    while (minesPlaced < this.mines) {
+      let iCandidate = int(random(0, this.inum));
+      let jCandidate = int(random(0, this.jnum));
+      if (
+        this.cells[iCandidate][jCandidate].mine == false &&
+        iCandidate != i &&
+        jCandidate != j
+      ) {
+        // Make this cell a mine and update the number of mines placed
+        this.cells[iCandidate][jCandidate].mine = true;
+        minesPlaced++;
+      }
+    }
+
+    // Calculate the number of surrounding mines for each cell
+    for (let i = 0; i < this.inum; i++) {
+      for (let j = 0; j < this.jnum; j++) {
+        this.assignNumber(i, j);
       }
     }
   }
