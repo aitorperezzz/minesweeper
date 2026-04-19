@@ -14,9 +14,18 @@ const numCellsHeader = 3;
 const screenProportion = 0.95;
 // The margin of the displays inside their respective containers
 const displaysProportion = 0.8;
+const headerDisplayGapProportion = 0.25;
 // Panel number dimensions
 const panelNumberWidth = 13;
 const panelNumberHeight = 23;
+
+function getCurrentArenaConfig() {
+  if (arena != undefined && arena.mode != undefined) {
+    return arenaConfig[arena.mode];
+  }
+
+  return arenaConfig.beginner;
+}
 
 function computeSizes() {
   const container = document.getElementById("sketch-holder");
@@ -25,9 +34,9 @@ function computeSizes() {
   const canvasStyles = canvas ? getComputedStyle(canvas) : undefined;
 
   // Compute the optimal canvas ratio
-  let expertConfig = arenaConfig.expert;
+  let currentConfig = getCurrentArenaConfig();
   // Ratio will be width divided by height
-  let canvasRatio = expertConfig.i / (expertConfig.j + numCellsHeader);
+  let canvasRatio = currentConfig.i / (currentConfig.j + numCellsHeader);
 
   const containerHorizontalChrome =
     parseFloat(containerStyles.paddingLeft) +

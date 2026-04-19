@@ -45,6 +45,12 @@ class Arena {
     this.jnum = config.j;
     this.mines = config.mines;
 
+    if (arena === this) {
+      resizeGame();
+    } else {
+      this.computeArenaSizes();
+    }
+
     // recompute the initial coordinates of the cells area
     this.computeCellsCoordinates();
 
@@ -76,44 +82,57 @@ class Arena {
   }
 
   computeArenaSizes() {
-    // The cell size simply depends on the width, because the expert mode
-    // needs to occupy the horizontal space fully
-    this.cellSize = this.canvasWidth / arenaConfig.expert.i;
+    const config = arenaConfig[this.mode] || arenaConfig.beginner;
+    this.cellSize = Math.min(
+      this.canvasWidth / config.i,
+      this.canvasHeight / (config.j + numCellsHeader),
+    );
 
     // Sizes of the header
-    this.headerWidth = this.canvasWidth;
+    this.headerWidth = this.cellSize * config.i;
     this.headerHeight = this.cellSize * numCellsHeader;
-    this.headerx = 0;
+    this.headerx = (this.canvasWidth - this.headerWidth) / 2;
     this.headery = 0;
     // Sizes of the grid below
-    this.gridWidth = this.canvasWidth;
-    this.gridHeight = this.cellSize * arenaConfig.expert.j;
-    this.gridx = 0;
+    this.gridWidth = this.headerWidth;
+    this.gridHeight = this.cellSize * config.j;
+    this.gridx = this.headerx;
     this.gridy = this.headerHeight;
 
     // inside the header
 
-    // generic margin for the displays
-    let margin =
-      (this.headerHeight - this.headerHeight * displaysProportion) / 2;
+    const numberDisplayAspect = (3 * panelNumberWidth) / panelNumberHeight;
+    const maxDisplayHeightByHeaderWidth =
+      this.headerWidth /
+      (2 * numberDisplayAspect + 1 + 4 * headerDisplayGapProportion);
+    const displayHeight = Math.min(
+      this.headerHeight * displaysProportion,
+      maxDisplayHeightByHeaderWidth,
+    );
+    const horizontalMargin = displayHeight * headerDisplayGapProportion;
+    const verticalMargin = (this.headerHeight - displayHeight) / 2;
+
     // mines left display (left)
-    this.minesDisplayHeight = this.headerHeight - 2 * margin;
+    this.minesDisplayHeight = displayHeight;
     this.minesDisplayWidth =
       (this.minesDisplayHeight * 3 * panelNumberWidth) / panelNumberHeight;
-    this.minesDisplayx = this.headerx + margin;
-    this.minesDisplayy = this.headery + margin;
+    this.minesDisplayx = this.headerx + horizontalMargin;
+    this.minesDisplayy = this.headery + verticalMargin;
     // timer display (right)
     this.timerDisplayHeight = this.minesDisplayHeight;
     this.timerDisplayWidth = this.minesDisplayWidth;
     this.timerDisplayx =
-      this.headerx + this.headerWidth - margin - this.timerDisplayWidth;
-    this.timerDisplayy = this.headery + margin;
+      this.headerx +
+      this.headerWidth -
+      horizontalMargin -
+      this.timerDisplayWidth;
+    this.timerDisplayy = this.headery + verticalMargin;
     // face icon display (center)
     this.faceDisplayHeight = this.minesDisplayHeight;
     this.faceDisplayWidth = this.faceDisplayHeight;
     this.faceDisplayx =
       this.headerx + this.headerWidth / 2 - this.faceDisplayWidth / 2;
-    this.faceDisplayy = this.headery + margin;
+    this.faceDisplayy = this.headery + verticalMargin;
   }
 
   computeCellsCoordinates() {
