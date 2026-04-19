@@ -11,8 +11,23 @@ let activeTouchPointerId;
 const longPressDuration = 500;
 const touchMoveTolerance = 10;
 
+function getCanvasElement(event) {
+  if (event?.currentTarget instanceof HTMLCanvasElement) {
+    return event.currentTarget;
+  }
+
+  if (event?.target instanceof Element) {
+    const canvasElement = event.target.closest("canvas");
+    if (canvasElement != undefined) {
+      return canvasElement;
+    }
+  }
+
+  return document.querySelector("#sketch-holder canvas");
+}
+
 function getCanvasPoint(event) {
-  const canvasElement = event.currentTarget;
+  const canvasElement = getCanvasElement(event);
   const rect = canvasElement.getBoundingClientRect();
   const styles = getComputedStyle(canvasElement);
   const borderLeft = parseFloat(styles.borderLeftWidth);
@@ -123,22 +138,25 @@ function mousePressed(event) {
     !isSecondaryClick && (mouseButton.left || event.button === 0);
 
   if (isPrimaryClick) {
+    const point = getCanvasPoint(event);
     buttonPressedPrimary = true;
-    arena.press(mouseX, mouseY);
+    arena.press(point.x, point.y);
   } else if (isSecondaryClick) {
-    arena.flag(mouseX, mouseY);
+    const point = getCanvasPoint(event);
+    arena.flag(point.x, point.y);
     return false;
   }
 }
 
-function mouseReleased() {
+function mouseReleased(event) {
   if (Date.now() < ignoreMouseUntil) {
     return false;
   }
 
   if (buttonPressedPrimary) {
+    const point = getCanvasPoint(event);
     buttonPressedPrimary = false;
-    arena.release(mouseX, mouseY);
+    arena.release(point.x, point.y);
   }
 }
 
