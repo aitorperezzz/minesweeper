@@ -171,6 +171,11 @@ class Arena {
   }
 
   reveal(i, j) {
+    // A flagged cell is protected against reveal
+    if (this.cells[i][j].flag) {
+      return;
+    }
+
     if (this.cells[i][j].mine) {
       // This mine is the culprit
       this.cells[i][j].mineCulprit = true;
@@ -236,7 +241,9 @@ class Arena {
   press(mx, my) {
     if (this.playing) {
       let cell = this.getClickedCell(mx, my);
-      if (cell != undefined) {
+      // Only put the surprised face if the cell is not revealed
+      // and not flagged (meaning it would be revealed)
+      if (cell != undefined && !cell.revealed && !cell.flag) {
         this.faceDisplay.setIcon(icons.surprised);
       }
     }
@@ -336,8 +343,8 @@ class Arena {
       return;
     }
 
-    // Ignore if the cell is already revealed
-    if (this.cells[i][j].revealed) {
+    // Ignore if the cell is already revealed or flagged
+    if (this.cells[i][j].revealed || this.cells[i][j].flag) {
       return;
     }
 
