@@ -5,11 +5,18 @@ let touchLongPressTriggered = false;
 let touchMovedTooFar = false;
 let touchStartX = 0;
 let touchStartY = 0;
+let touchStartClientX = 0;
+let touchStartClientY = 0;
 let ignoreMouseUntil = 0;
 let activeTouchPointerId;
 
 const longPressDuration = 500;
-const touchMoveTolerance = 10;
+const touchMoveTolerance = 18;
+const syntheticMouseIgnoreDuration = 1000;
+
+function ignoreSyntheticMouse() {
+  ignoreMouseUntil = Date.now() + syntheticMouseIgnoreDuration;
+}
 
 function getCanvasElement(event) {
   if (event?.currentTarget instanceof HTMLCanvasElement) {
@@ -51,6 +58,7 @@ function startLongPressTimer() {
   cancelTouchLongPress();
   touchLongPressTimer = setTimeout(() => {
     touchLongPressTriggered = true;
+    ignoreSyntheticMouse();
     arena.faceDisplay.setIcon(icons.happy);
     arena.flag(touchStartX, touchStartY);
   }, longPressDuration);
@@ -67,13 +75,15 @@ function installCanvasInputHandlers(canvasElement) {
     }
 
     event.preventDefault();
-    ignoreMouseUntil = Date.now() + 700;
+    ignoreSyntheticMouse();
     activeTouchPointerId = event.pointerId;
     canvasElement.setPointerCapture(event.pointerId);
 
     const point = getCanvasPoint(event);
     touchStartX = point.x;
     touchStartY = point.y;
+    touchStartClientX = event.clientX;
+    touchStartClientY = event.clientY;
     touchLongPressTriggered = false;
     touchMovedTooFar = false;
 
@@ -87,11 +97,13 @@ function installCanvasInputHandlers(canvasElement) {
     }
 
     event.preventDefault();
-    const point = getCanvasPoint(event);
     const movedTooFar =
-      dist(touchStartX, touchStartY, point.x, point.y) > touchMoveTolerance;
+      Math.hypot(
+        event.clientX - touchStartClientX,
+        event.clientY - touchStartClientY,
+      ) > touchMoveTolerance;
 
-    if (movedTooFar) {
+    if (movedTooFar && !touchLongPressTriggered) {
       touchMovedTooFar = true;
       cancelTouchLongPress();
       arena.faceDisplay.setIcon(icons.happy);
@@ -104,7 +116,7 @@ function installCanvasInputHandlers(canvasElement) {
     }
 
     event.preventDefault();
-    ignoreMouseUntil = Date.now() + 700;
+    ignoreSyntheticMouse();
     cancelTouchLongPress();
 
     if (!touchLongPressTriggered && !touchMovedTooFar) {
@@ -121,9 +133,15 @@ function installCanvasInputHandlers(canvasElement) {
     }
 
     event.preventDefault();
+    ignoreSyntheticMouse();
     cancelTouchLongPress();
     arena.faceDisplay.setIcon(icons.happy);
     resetTouchState();
+  });
+
+  canvasElement.addEventListener("contextmenu", (event) => {
+    event.preventDefault();
+    ignoreSyntheticMouse();
   });
 }
 
@@ -170,7 +188,7 @@ function touchStarted() {
     return false;
   }
 
-  ignoreMouseUntil = Date.now() + 700;
+  ignoreSyntheticMouse();
   touchLongPressTriggered = false;
   touchMovedTooFar = false;
   touchStartX = mouseX;
@@ -188,9 +206,10 @@ function touchMoved() {
   }
 
   const movedTooFar =
-    dist(touchStartX, touchStartY, mouseX, mouseY) > touchMoveTolerance;
+    dist(touchStartX, touchStartY, mouseX, mouseY) >
+    Math.max(touchMoveTolerance, arena.cellSize * 0.15);
 
-  if (movedTooFar) {
+  if (movedTooFar && !touchLongPressTriggered) {
     touchMovedTooFar = true;
     cancelTouchLongPress();
     arena.faceDisplay.setIcon(icons.happy);
@@ -204,7 +223,7 @@ function touchEnded() {
     return false;
   }
 
-  ignoreMouseUntil = Date.now() + 700;
+  ignoreSyntheticMouse();
   cancelTouchLongPress();
 
   if (!touchLongPressTriggered && !touchMovedTooFar) {
