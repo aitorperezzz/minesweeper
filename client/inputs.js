@@ -1,7 +1,5 @@
 // Mouse and touch input state
 let buttonPressedPrimary = false;
-let touchLongPressTimer;
-let touchLongPressTriggered = false;
 let touchMovedTooFar = false;
 let touchStartX = 0;
 let touchStartY = 0;
@@ -9,8 +7,8 @@ let touchStartClientX = 0;
 let touchStartClientY = 0;
 let ignoreMouseUntil = 0;
 let activeTouchPointerId;
+let flagMode = false;
 
-const longPressDuration = 500;
 const touchMoveTolerance = 18;
 const syntheticMouseIgnoreDuration = 1000;
 
@@ -49,19 +47,34 @@ function getCanvasPoint(event) {
 }
 
 function resetTouchState() {
-  touchLongPressTriggered = false;
   touchMovedTooFar = false;
   activeTouchPointerId = undefined;
 }
 
-function startLongPressTimer() {
-  cancelTouchLongPress();
-  touchLongPressTimer = setTimeout(() => {
-    touchLongPressTriggered = true;
-    ignoreSyntheticMouse();
-    arena.faceDisplay.setIcon(icons.happy);
-    arena.flag(touchStartX, touchStartY);
-  }, longPressDuration);
+function setFlagMode(enabled) {
+  flagMode = enabled;
+  updateFlagModeButton();
+}
+
+function toggleFlagMode() {
+  setFlagMode(!flagMode);
+}
+
+function flagOnce(mx, my) {
+  if (arena.flag(mx, my)) {
+    setFlagMode(false);
+  }
+}
+
+function updateFlagModeButton() {
+  const button = document.getElementById("flag-mode-button");
+  if (button == undefined) {
+    return;
+  }
+
+  button.classList.toggle("is-active", flagMode);
+  button.setAttribute("aria-pressed", String(flagMode));
+  button.textContent = flagMode ? "Flag: On" : "Flag: Off";
 }
 
 function installCanvasInputHandlers(canvasElement) {
@@ -80,15 +93,13 @@ function installCanvasInputHandlers(canvasElement) {
     canvasElement.setPointerCapture(event.pointerId);
 
     const point = getCanvasPoint(event);
-    touchStartX = point.x;
-    touchStartY = point.y;
     touchStartClientX = event.clientX;
     touchStartClientY = event.clientY;
-    touchLongPressTriggered = false;
     touchMovedTooFar = false;
 
-    arena.press(point.x, point.y);
-    startLongPressTimer();
+    if (!flagMode) {
+      arena.press(point.x, point.y);
+    }
   });
 
   canvasElement.addEventListener("pointermove", (event) => {
@@ -103,9 +114,8 @@ function installCanvasInputHandlers(canvasElement) {
         event.clientY - touchStartClientY,
       ) > touchMoveTolerance;
 
-    if (movedTooFar && !touchLongPressTriggered) {
+    if (movedTooFar) {
       touchMovedTooFar = true;
-      cancelTouchLongPress();
       arena.faceDisplay.setIcon(icons.happy);
     }
   });
@@ -117,11 +127,14 @@ function installCanvasInputHandlers(canvasElement) {
 
     event.preventDefault();
     ignoreSyntheticMouse();
-    cancelTouchLongPress();
 
-    if (!touchLongPressTriggered && !touchMovedTooFar) {
+    if (!touchMovedTooFar) {
       const point = getCanvasPoint(event);
-      arena.release(point.x, point.y);
+      if (flagMode) {
+        flagOnce(point.x, point.y);
+      } else {
+        arena.release(point.x, point.y);
+      }
     }
 
     resetTouchState();
@@ -134,7 +147,6 @@ function installCanvasInputHandlers(canvasElement) {
 
     event.preventDefault();
     ignoreSyntheticMouse();
-    cancelTouchLongPress();
     arena.faceDisplay.setIcon(icons.happy);
     resetTouchState();
   });
@@ -156,11 +168,20 @@ function mousePressed(event) {
 
   if (isPrimaryClick) {
     const point = getCanvasPoint(event);
+    if (flagMode) {
+      flagOnce(point.x, point.y);
+      return false;
+    }
+
     buttonPressedPrimary = true;
     arena.press(point.x, point.y);
   } else if (isSecondaryClick) {
     const point = getCanvasPoint(event);
-    arena.flag(point.x, point.y);
+    if (flagMode) {
+      flagOnce(point.x, point.y);
+    } else {
+      arena.flag(point.x, point.y);
+    }
     return false;
   }
 }
@@ -177,24 +198,19 @@ function mouseReleased(event) {
   }
 }
 
-function cancelTouchLongPress() {
-  clearTimeout(touchLongPressTimer);
-  touchLongPressTimer = undefined;
-}
-
 function touchStarted() {
   if (window.PointerEvent) {
     return false;
   }
 
   ignoreSyntheticMouse();
-  touchLongPressTriggered = false;
   touchMovedTooFar = false;
   touchStartX = mouseX;
   touchStartY = mouseY;
 
-  arena.press(mouseX, mouseY);
-  startLongPressTimer();
+  if (!flagMode) {
+    arena.press(mouseX, mouseY);
+  }
 
   return false;
 }
@@ -208,9 +224,8 @@ function touchMoved() {
     dist(touchStartX, touchStartY, mouseX, mouseY) >
     Math.max(touchMoveTolerance, arena.cellSize * 0.15);
 
-  if (movedTooFar && !touchLongPressTriggered) {
+  if (movedTooFar) {
     touchMovedTooFar = true;
-    cancelTouchLongPress();
     arena.faceDisplay.setIcon(icons.happy);
   }
 
@@ -223,10 +238,13 @@ function touchEnded() {
   }
 
   ignoreSyntheticMouse();
-  cancelTouchLongPress();
 
-  if (!touchLongPressTriggered && !touchMovedTooFar) {
-    arena.release(mouseX, mouseY);
+  if (!touchMovedTooFar) {
+    if (flagMode) {
+      flagOnce(mouseX, mouseY);
+    } else {
+      arena.release(mouseX, mouseY);
+    }
   }
 
   resetTouchState();
@@ -236,7 +254,7 @@ function touchEnded() {
 function keyPressed(event) {
   const isFindShortcut = event.ctrlKey || event.metaKey;
   if (!isFindShortcut && key.toLowerCase() === "f") {
-    arena.flag(mouseX, mouseY);
+    toggleFlagMode();
     return false;
   }
 }

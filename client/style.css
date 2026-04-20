@@ -75,6 +75,15 @@ body {
   background: #b8b8b8;
 }
 
+.button.is-active {
+  border-top: 2px solid #7b7b7b;
+  border-left: 2px solid #7b7b7b;
+  border-right: 2px solid #ffffff;
+  border-bottom: 2px solid #ffffff;
+  background: #000080;
+  color: #ffffff;
+}
+
 .button:focus {
   outline: 1px dotted #000;
   outline-offset: -4px;

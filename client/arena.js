@@ -225,18 +225,19 @@ class Arena {
   // The user attempts to flag (or unflag)
   // at the given coordinates
   flag(mx, my) {
-    if (this.playing) {
-      let cell = this.getClickedCell(mx, my);
-      if (cell != undefined) {
-        if (!cell.revealed) {
-          cell.flag = !cell.flag;
-          this.numFlagged = cell.flag
-            ? this.numFlagged + 1
-            : this.numFlagged - 1;
-          this.minesLeftDisplay.updateNumber(this.mines - this.numFlagged);
-        }
-      }
+    if (!this.playing) {
+      return false;
     }
+
+    let cell = this.getClickedCell(mx, my);
+    if (cell == undefined || cell.revealed) {
+      return false;
+    }
+
+    cell.flag = !cell.flag;
+    this.numFlagged = cell.flag ? this.numFlagged + 1 : this.numFlagged - 1;
+    this.minesLeftDisplay.updateNumber(this.mines - this.numFlagged);
+    return true;
   }
 
   // Pressing on the cells area only changes the face
