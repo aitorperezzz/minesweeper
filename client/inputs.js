@@ -116,7 +116,7 @@ function installCanvasInputHandlers(canvasElement) {
 
     if (movedTooFar) {
       touchMovedTooFar = true;
-      arena.faceDisplay.setIcon(icons.happy);
+      arena.resetFaceDisplay();
     }
   });
 
@@ -147,7 +147,7 @@ function installCanvasInputHandlers(canvasElement) {
 
     event.preventDefault();
     ignoreSyntheticMouse();
-    arena.faceDisplay.setIcon(icons.happy);
+    arena.resetFaceDisplay();
     resetTouchState();
   });
 
@@ -226,7 +226,7 @@ function touchMoved() {
 
   if (movedTooFar) {
     touchMovedTooFar = true;
-    arena.faceDisplay.setIcon(icons.happy);
+    arena.resetFaceDisplay();
   }
 
   return false;

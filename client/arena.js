@@ -27,7 +27,10 @@ class Arena {
     this.computeArenaSizes();
 
     // counters and displays
-    this.faceDisplay = new IconDisplay();
+    this.faceDisplay = new ClickableIconDisplay(
+      icons.happy,
+      icons.happyPressed,
+    );
     this.timerDisplay = new TimerDisplay();
     this.minesLeftDisplay = new NumberDisplay();
 
@@ -74,11 +77,12 @@ class Arena {
     // Reset the timer
     this.timerDisplay.reset();
 
-    // Face resets to happy
-    this.faceDisplay.setIcon(icons.happy);
-
     // Flag used to disable all inputs when the user has won or lost
     this.playing = true;
+    this.result = "playing";
+    this.facePressed = false;
+    this.cellPressed = false;
+    this.resetFaceDisplay();
   }
 
   computeArenaSizes() {
@@ -210,7 +214,8 @@ class Arena {
     console.log("Lose");
     this.timerDisplay.stop();
     this.playing = false;
-    this.faceDisplay.setIcon(icons.lose);
+    this.result = "lose";
+    this.resetFaceDisplay();
     // Reveal all the cells with mines
     this.revealAllMines();
   }
@@ -219,7 +224,8 @@ class Arena {
     console.log("Win");
     this.timerDisplay.stop();
     this.playing = false;
-    this.faceDisplay.setIcon(icons.win);
+    this.result = "win";
+    this.resetFaceDisplay();
   }
 
   // The user attempts to flag (or unflag)
@@ -242,25 +248,48 @@ class Arena {
 
   // Pressing on the cells area only changes the face
   press(mx, my) {
+    this.facePressed = this.isFacePressed(mx, my);
+    this.cellPressed = false;
+
     if (this.playing) {
       let cell = this.getClickedCell(mx, my);
       // Only put the surprised face if the cell is not revealed
       // and not flagged (meaning it would be revealed)
       if (cell != undefined && !cell.revealed && !cell.flag) {
+        this.cellPressed = true;
         this.faceDisplay.setIcon(icons.surprised);
       }
+    }
+
+    // The face can be pressed
+    if (this.facePressed) {
+      this.faceDisplay.press();
     }
   }
 
   // Releasing the primary button is an attempt to reveal a cell
   release(mx, my) {
-    if (this.playing) {
+    const shouldRestart = this.facePressed && this.isFacePressed(mx, my);
+    this.facePressed = false;
+    const shouldReveal = this.cellPressed;
+    this.cellPressed = false;
+
+    if (shouldRestart) {
+      this.play(this.mode);
+      return;
+    }
+
+    if (this.playing && shouldReveal) {
       let cell = this.getClickedCell(mx, my);
       if (cell != undefined) {
-        arena.faceDisplay.setIcon(icons.happy);
+        this.resetFaceDisplay();
         this.reveal(cell.i, cell.j);
       }
     }
+
+    // Releasing the mouse changes the face back to the correct base icon
+    // no matter whether the game is active, won, or lost.
+    this.resetFaceDisplay();
   }
 
   // Place mines knowing that the user has clicked the provided coordinates
@@ -398,5 +427,23 @@ class Arena {
 
   isAccessible(i, j) {
     return i >= 0 && i < this.inum && j >= 0 && j < this.jnum;
+  }
+
+  isFacePressed(mx, my) {
+    return (
+      this.faceDisplayx < mx &&
+      mx < this.faceDisplayx + this.faceDisplayWidth &&
+      this.faceDisplayy < my &&
+      my < this.faceDisplayy + this.faceDisplayHeight
+    );
+  }
+
+  resetFaceDisplay() {
+    if (this.playing) {
+      this.faceDisplay.release();
+      return;
+    }
+
+    this.faceDisplay.setIcon(this.result === "lose" ? icons.lose : icons.win);
   }
 }
