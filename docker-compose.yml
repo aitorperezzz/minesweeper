@@ -1,6 +1,7 @@
 services:
   minesweeper:
-    image: registry.home/homelab/minesweeper:latest
+    build: .
+    image: ${IMAGE:-minesweeper:latest}
     restart: unless-stopped
     container_name: minesweeper
     ports:

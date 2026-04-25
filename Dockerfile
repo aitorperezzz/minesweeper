@@ -1,6 +1,13 @@
-FROM node:alpine
-COPY . /app
+FROM node:22-alpine
+
 WORKDIR /app
-RUN npm install
+
+COPY package*.json ./
+RUN npm ci --omit=dev
+
+COPY client ./client
+COPY server ./server
+
 EXPOSE 8080
+
 CMD ["npm", "start"]

@@ -47,13 +47,13 @@ http://localhost:8080
 Start the service:
 
 ```sh
-docker compose up --build
+docker compose up -d --build
 ```
 
-To run it in the background:
+Use a different image name when needed:
 
 ```sh
-docker compose up --build -d
+IMAGE=registry.example.com/group/minesweeper:latest docker compose up -d
 ```
 
 Stop the service:

@@ -39,7 +39,6 @@ class Arena {
   }
 
   play(mode) {
-    console.log("Starting game in mode " + mode);
     this.mode = mode;
 
     // configuration depending on the mode
@@ -211,7 +210,6 @@ class Arena {
   }
 
   lose() {
-    console.log("Lose");
     this.timerDisplay.stop();
     this.playing = false;
     this.result = "lose";
@@ -221,7 +219,6 @@ class Arena {
   }
 
   win() {
-    console.log("Win");
     this.timerDisplay.stop();
     this.playing = false;
     this.result = "win";
