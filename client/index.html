@@ -13,9 +13,10 @@
     <script src="/lib/p5.min.js"></script>
 
     <!-- Add the scripts in the order needed, first the definition of the classes and then the scripts that are going to use them -->
-    <script src="icondisplay.js"></script>
-    <script src="numberdisplay.js"></script>
-    <script src="timerdisplay.js"></script>
+    <script src="iconDisplay.js"></script>
+    <script src="clickableIconDisplay.js"></script>
+    <script src="numberDisplay.js"></script>
+    <script src="timerDisplay.js"></script>
     <script src="arena.js"></script>
     <script src="cell.js"></script>
     <script src="sketch.js"></script>
@@ -26,6 +27,18 @@
       <button class="button" onclick="playBeginner()">Beginner</button>
       <button class="button" onclick="playIntermediate()">Intermediate</button>
       <button class="button" onclick="playExpert()">Expert</button>
+      <button
+        id="flag-mode-button"
+        class="button"
+        type="button"
+        aria-pressed="false"
+        onclick="toggleFlagMode()"
+      >
+        Flag: Off
+      </button>
+      <p id="controls-help">
+        Tap/click: reveal · Flag: mark one cell · Right click: flag
+      </p>
     </div>
     <div id="sketch-holder"></div>
   </body>

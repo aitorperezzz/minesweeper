@@ -165,14 +165,17 @@ function draw() {
 
 function playBeginner() {
   arena.play("beginner");
+  setFlagMode(false);
 }
 
 function playIntermediate() {
   arena.play("intermediate");
+  setFlagMode(false);
 }
 
 function playExpert() {
   arena.play("expert");
+  setFlagMode(false);
 }
 
 function windowResized() {
