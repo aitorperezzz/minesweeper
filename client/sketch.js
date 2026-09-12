@@ -100,41 +100,54 @@ function scheduleResizeGame() {
 
 // p5js specific functions
 async function setup() {
+  const [
+    happy,
+    happyPressed,
+    surprised,
+    lose,
+    win,
+    mine,
+    mineCulprit,
+    flag,
+    revealed,
+    ...remainingIcons
+  ] = await Promise.all([
+    "icons/happy.png",
+    "icons/happy_pressed.png",
+    "icons/surprised.png",
+    "icons/lose.png",
+    "icons/win.png",
+    "icons/mine.png",
+    "icons/mine_culprit.png",
+    "icons/flag.png",
+    "icons/revealed.png",
+    ...Array.from({ length: 8 }, (_, index) =>
+      `icons/revealed_${index + 1}.png`,
+    ),
+    "icons/unrevealed.png",
+    "icons/panel_dash.png",
+    ...Array.from({ length: 10 }, (_, index) => `icons/panel_${index}.png`),
+  ].map((path) => loadImage(path)));
+
+  const revealedNumbers = remainingIcons.slice(0, 8);
+  const unrevealed = remainingIcons[8];
+  const numberDash = remainingIcons[9];
+  const numbers = remainingIcons.slice(10);
+
   icons = {
-    happy: await loadImage("icons/happy.png"),
-    happyPressed: await loadImage("icons/happy_pressed.png"),
-    surprised: await loadImage("icons/surprised.png"),
-    lose: await loadImage("icons/lose.png"),
-    win: await loadImage("icons/win.png"),
-    mine: await loadImage("icons/mine.png"),
-    mineCulprit: await loadImage("icons/mine_culprit.png"),
-    flag: await loadImage("icons/flag.png"),
-    revealed: await loadImage("icons/revealed.png"),
-    revealedNumbers: [
-      undefined,
-      await loadImage("icons/revealed_1.png"),
-      await loadImage("icons/revealed_2.png"),
-      await loadImage("icons/revealed_3.png"),
-      await loadImage("icons/revealed_4.png"),
-      await loadImage("icons/revealed_5.png"),
-      await loadImage("icons/revealed_6.png"),
-      await loadImage("icons/revealed_7.png"),
-      await loadImage("icons/revealed_8.png"),
-    ],
-    unrevealed: await loadImage("icons/unrevealed.png"),
-    numberDash: await loadImage("icons/panel_dash.png"),
-    numbers: [
-      await loadImage("icons/panel_0.png"),
-      await loadImage("icons/panel_1.png"),
-      await loadImage("icons/panel_2.png"),
-      await loadImage("icons/panel_3.png"),
-      await loadImage("icons/panel_4.png"),
-      await loadImage("icons/panel_5.png"),
-      await loadImage("icons/panel_6.png"),
-      await loadImage("icons/panel_7.png"),
-      await loadImage("icons/panel_8.png"),
-      await loadImage("icons/panel_9.png"),
-    ],
+    happy,
+    happyPressed,
+    surprised,
+    lose,
+    win,
+    mine,
+    mineCulprit,
+    flag,
+    revealed,
+    revealedNumbers: [undefined, ...revealedNumbers],
+    unrevealed,
+    numberDash,
+    numbers,
   };
 
   computeSizes();

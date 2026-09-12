@@ -298,8 +298,7 @@ class Arena {
       let jCandidate = int(random(0, this.jnum));
       if (
         this.cells[iCandidate][jCandidate].mine == false &&
-        iCandidate != i &&
-        jCandidate != j
+        (iCandidate !== i || jCandidate !== j)
       ) {
         // Make this cell a mine and update the number of mines placed
         this.cells[iCandidate][jCandidate].mine = true;
