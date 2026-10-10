@@ -1,7 +1,6 @@
 services:
   minesweeper:
-    build: .
-    image: ${IMAGE:-minesweeper:latest}
+    image: ghcr.io/aitorperezzz/minesweeper:latest
     restart: unless-stopped
     container_name: minesweeper
     ports:
